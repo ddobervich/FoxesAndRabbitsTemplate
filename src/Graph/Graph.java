@@ -44,26 +44,26 @@ public class Graph {
 	public int HSPACING = 20;
 	PFont font;
 
-	public Graph(PApplet p, float xmin, float ymin, float xmax, float ymax,
+	public Graph(PApplet p, float _xmin, float _ymin, float _xmax, float _ymax,
 			float dataxmin, float dataymin, float dataxmax, float dataymax) {
-		this.xmin = xmin;
-		this.ymin = ymin;
-		this.xmax = xmax;
-		this.ymax = ymax;
+		xmin = _xmin; // this is how at least one style guide recommends you make constructors
+		ymin = _ymin;
+		xmax = _xmax;
+		ymax = _ymax;
 		setDataRanges(dataxmin, dataxmax, dataymin, dataymax);
 		this.graphicsWindow = p;
 		this.dataSets = new HashMap<Object, ScaledDataSet>();
 		this.colorMap = new HashMap<Object, Integer>();
-		this.defaultColors = new int[3];
-		this.defaultColors[0] = p.color(255, 100, 100);
-		this.defaultColors[1] = p.color(100, 100, 255);
-		this.defaultColors[2] = p.color(100, 255, 100);
+		Graph.defaultColors = new int[3]; // use class name for static variable reference
+		Graph.defaultColors[0] = p.color(255, 100, 100);
+		Graph.defaultColors[1] = p.color(100, 100, 255);
+		Graph.defaultColors[2] = p.color(100, 255, 100);
 		font = p.createFont("SansSerif", 20);
 		p.textFont(font);
 	}
 
-	public void setDataRanges(float xmin, float xmax, float ymin, float ymax) {
-		this.dataxmin = xmin;
+	public void setDataRanges(float _xmin, float _xmax, float _ymin, float _ymax) {
+		this.dataxmin = xmin; // completely useless use of (this) in the first place
 		this.dataxmax = xmax;
 		this.dataymin = ymin;
 		this.dataymax = ymax;
