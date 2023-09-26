@@ -25,7 +25,7 @@ public class Main extends PApplet {
             textSize++;
             textSize(textSize);
             tempTextWidth = textWidth("Press 'p' to pause and unpause the simulation");
-        } while (tempTextWidth < width - 2* TEXT_EDGE_BUFFER);
+        } while (tempTextWidth < width - (2 * TEXT_EDGE_BUFFER));
         textSize--;
         System.out.println("Set text size to " + textSize);
     }

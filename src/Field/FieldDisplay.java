@@ -44,7 +44,7 @@ public class FieldDisplay {
         this.dx = (float)w / f.getWidth();
         this.dy = (float)h / f.getHeight();
 
-        colors = new LinkedHashMap<Class, Integer>();
+        colors = new LinkedHashMap<>();
     }
 
     public void drawField(Field field) {
@@ -58,7 +58,7 @@ public class FieldDisplay {
                     p.fill(animalColor);
                     
                 } else {
-                    p.fill(this.EMPTY_COLOR);
+                    p.fill(EMPTY_COLOR);
                 }
                 p.rect(x + col * dx, y + row * dy, dx, dy);
             }
@@ -105,6 +105,6 @@ public class FieldDisplay {
     }
 
     public int getRightEdge() {
-        return x+w;
+        return x + w;
     }
 }

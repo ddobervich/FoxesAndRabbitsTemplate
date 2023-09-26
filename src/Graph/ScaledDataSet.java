@@ -2,18 +2,17 @@ package Graph;
 
 import java.util.ArrayList;
 
-public class ScaledDataSet {
-    private ArrayList<Float> xvals, yvals;
+public class ScaledDataSet extends ArrayList<Point> {
+    //private ArrayList<Float> xvals, yvals; // why. just use an arraylist<point> but that requires a *lot* of refactoring so i won't do it
     private boolean yscaling = true;
     private boolean xscaling = true;
     private float inputymin, inputymax, scaledymin, scaledymax;
     private float inputxmin, inputxmax, scaledxmin, scaledxmax;
-    private float xmin, xmax, ymin, ymax;
+    private float xmin, xmax, ymin, ymax; // technically these are duplicated by the methods ArrayList.max() and ArrayList.min() but that would require implementing IEComparableComplex (IN A PREEXISTING USE ENVIRONMENT) and i'm not about to do that for this
     private float yshiftval, yscaleval, xshiftval, xscaleval;
 
     public ScaledDataSet() {
-        xvals = new ArrayList<Float>();
-        yvals = new ArrayList<Float>();
+        super.clear();
         xmax = Float.MIN_NORMAL;
         ymax = Float.MIN_NORMAL;
         xmin = Float.MAX_VALUE;
@@ -26,45 +25,39 @@ public class ScaledDataSet {
     // and what you want the scaled min and max to be.
     // ** addpoint will ignore data points not between
     // the input min and max! **
-    public void setyScaling(float inputymin, float scaledymin,
-            float inputymax, float scaledymax) {
-        this.inputymin = inputymin;
-        this.inputymax = inputymax;
-        this.scaledymin = scaledymin;
-        this.scaledymax = scaledymax;
-        this.yscaling = true;
-        this.yscaleval = (scaledymax - scaledymin)/(inputymax - inputymin);
-        this.yshiftval = scaledymin - yscaleval*inputymin;
+    public void setyScaling(float _inputymin, float _scaledymin,
+            float _inputymax, float _scaledymax) {
+        inputymin = _inputymin;
+        inputymax = _inputymax;
+        scaledymin = _scaledymin;
+        scaledymax = _scaledymax;
+        yscaling = true;
+        yscaleval = (scaledymax - scaledymin)/(inputymax - inputymin);
+        yshiftval = scaledymin - yscaleval*inputymin;
     }
 
     // todo:  check if re-scaling to existing scaling values!
-    public void setxScaling(float inputxmin, float scaledxmin,
-            float inputxmax, float scaledxmax) {
-        this.inputxmin = inputxmin;
-        this.inputxmax = inputxmax;
-        this.scaledxmin = scaledxmin;
-        this.scaledxmax = scaledxmax;
-        this.xscaling = true;
-        this.xscaleval = (float)(scaledxmax - scaledxmin)/(float)(inputxmax - inputxmin);
-        this.xshiftval = scaledxmin - xscaleval*inputxmin;
+    // nope. A conditional is slower than just doing the math. Maybe pare down the amount of re-scaling that needs to be called externally.
+    public void setxScaling(float _inputxmin, float _scaledxmin,
+            float _inputxmax, float _scaledxmax) {
+        inputxmin = _inputxmin;
+        inputxmax = _inputxmax;
+        scaledxmin = _scaledxmin;
+        scaledxmax = _scaledxmax;
+        xscaling = true;
+        xscaleval = (scaledxmax - scaledxmin)/(inputxmax - inputxmin);
+        xshiftval = scaledxmin - xscaleval*inputxmin;
     }
 
     public void addPoint(float x, float y) {
-        if (yscaling) {
+        if (yscaling && xscaling) {
             // scale the input and then add!
-            y = y*yscaleval + yshiftval;
-            yvals.add(y);
+            y = y * yscaleval + yshiftval;
+            x = x * xscaleval + xshiftval;
+            this.add(new Point(x, y));
         } else {
             System.out.println("Graph.ScaledDataSet couldn't add point " + x + ", "
-                    + y + "; No y scale values set!");
-        }
-
-       if (xscaling) {
-            x = x*xscaleval + this.xshiftval;
-            xvals.add(x);
-        } else {
-            System.out.println("Graph.ScaledDataSet couldn't add point " + x + ", "
-                    + y + "; No x scale values set!");
+                    + y + "; No scale values set!");
         }
 
         // update min and max values
@@ -99,32 +92,14 @@ public class ScaledDataSet {
 
     // return number of data points in the set
     public int getSize() {
-        return xvals.size();
-    }
-
-    public void clearData() {
-        xvals.clear();
-        yvals.clear();
-        xmax = Float.MIN_NORMAL;
-        ymax = Float.MIN_NORMAL;
-        xmin = Float.MAX_VALUE;
-        ymin = Float.MAX_VALUE;
+        return super.size();
     }
 
     public void clear() {
-        xvals.clear();
-        yvals.clear();
-        xmax = Float.MIN_NORMAL;
+        super.clear();
+        xmax = Float.MIN_NORMAL; // Any reason we're using MIN_NORMAL instead of 0 or MIN_VALUE?
         ymax = Float.MIN_NORMAL;
-        xmin = Float.MAX_VALUE;
+        xmin = Float.MAX_VALUE; // Any reason we're using MAX_VALUE instead of POSITIVE_INFINITY?
         ymin = Float.MAX_VALUE;
-    }
-
-    public float getx(int num) {
-        return xvals.get(num);
-    }
-    
-    public float gety(int num) {
-        return yvals.get(num);
     }
 }
