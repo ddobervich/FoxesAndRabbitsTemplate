@@ -101,8 +101,8 @@ public class Simulator {
                 0, 500, field.getHeight() * field.getWidth());
 
         graph.title = "Animals.Fox and Animals.Rabbit Populations";
-        graph.xlabel = "Time";
-        graph.ylabel = "Pop.\t\t";
+        graph.xLabel = "Time";
+        graph.yLabel = "Pop.\t\t";
         graph.setColor(Rabbit.class, p.color(155, 155, 155));
         graph.setColor(Fox.class, p.color(200, 0, 255));
     }

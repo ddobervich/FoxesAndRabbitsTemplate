@@ -25,17 +25,17 @@ public class Graph {
 	private boolean cleardata = false;
 	
 	// DataSets for all past numbers of animals at any timestep
-	private HashMap<Object, ScaledDataSet> dataSets;
+	private HashMap<Object, ScaledDataSet> dataSets; // ignore java complaining about this it's wrong
 	private HashMap<Object, Integer> colorMap;
 	private static int[] defaultColors;
 	private int nextColor = 0;
 	public boolean drawLines = false;
 	public boolean drawPoints = true;
-	public int pointsize = 3;
+	public int pointSize = 3;
 	
 	// labels etc.
-	public String xlabel;
-	public String ylabel;
+	public String xLabel; // camel case dammit
+	public String yLabel;
 	public String title;
 	public int titlePointSize = 20;
 	public int labelPointSize = 16;
@@ -52,8 +52,8 @@ public class Graph {
 		ymax = _ymax;
 		setDataRanges(dataxmin, dataxmax, dataymin, dataymax);
 		this.graphicsWindow = p;
-		this.dataSets = new HashMap<Object, ScaledDataSet>();
-		this.colorMap = new HashMap<Object, Integer>();
+		this.dataSets = new HashMap<>(); // useless explicit type argument
+		this.colorMap = new HashMap<>();
 		Graph.defaultColors = new int[3]; // use class name for static variable reference
 		Graph.defaultColors[0] = p.color(255, 100, 100);
 		Graph.defaultColors[1] = p.color(100, 100, 255);
@@ -63,35 +63,32 @@ public class Graph {
 	}
 
 	public void setDataRanges(float _xmin, float _xmax, float _ymin, float _ymax) {
-		this.dataxmin = xmin; // completely useless use of (this) in the first place
-		this.dataxmax = xmax;
-		this.dataymin = ymin;
-		this.dataymax = ymax;
+		dataxmin = _xmin; // completely useless use of (this) in the first place
+		dataxmax = _xmax;
+		dataymin = _ymin;
+		dataymax = _ymax;
 
-		this.dataxrange = xmax - xmin;
-		this.datayrange = ymax - ymin;
+		dataxrange = _xmax - _xmin;
+		datayrange = _ymax - _ymin;
 
-		this.xscaleval = (float) (xmax - xmin) / (float) (dataxmax - dataxmin);
-		this.xshiftval = xmin - xscaleval * dataxmin;
-		this.yscaleval = (ymax - ymin) / (dataymax - dataymin);
-		this.yshiftval = ymin - yscaleval * dataymin;
+		xscaleval = (_xmax - _xmin) / (dataxmax - dataxmin); // redundant casting
+		xshiftval = _xmin - xscaleval * dataxmin;
+		yscaleval = (_ymax - _ymin) / (dataymax - dataymin);
+		yshiftval = _ymin - yscaleval * dataymin;
 
-		// this.xscaleval = (float) (dataxmax - dataxmin) / (float) (xmax - xmin);
-		// this.xshiftval = dataxmin - xscaleval * xmin;
-		// this.yscaleval = (dataymax - dataymin) / (ymax - ymin);
-		// this.yshiftval = dataymin - yscaleval * ymin;
+		// don't comment code for vcs just delete it
 	}
 
-	public void setPosition(float xmin, float xmax, float ymin, float ymax) {
-		this.xmin = xmin;
-		this.xmax = xmax;
-		this.ymin = ymin;
-		this.ymax = ymax;
+	public void setBounds(float _xmin, float _xmax, float _ymin, float _ymax) { // "position" should represent 1 (x,y) pair, not a pair of pairs
+		xmin = _xmin;
+		xmax = _xmax;
+		ymin = _ymin;
+		ymax = _ymax;
 	}
 
 	public void draw() {
 		int c;
-		ScaledDataSet d;
+		ScaledDataSet dataSet;
 
 		this.drawAxes();
 		drawTitle();
@@ -103,16 +100,16 @@ public class Graph {
 		drawYIncrementLabels();
 
 		for (Object f : dataSets.keySet()) {
-			d = dataSets.get(f);
+			dataSet = dataSets.get(f);
 			c = this.colorMap.get(f);
 			graphicsWindow.fill(c); // change the color
 			graphicsWindow.stroke(c); // change the color
-			for (int i = 1; i < d.getSize(); i++) {
+			for (int i = 1; i < dataSet.getSize(); i++) {
 				if (drawLines) {
-					graphicsWindow.line(d.getx(i - 1), d.gety(i - 1), d.getx(i), d.gety(i));
+					graphicsWindow.line(dataSet.get(i - 1).x, dataSet.get(i - 1).y, dataSet.get(i).x, dataSet.get(i).y);
 				}
 				if (drawPoints) {
-					graphicsWindow.ellipse(d.getx(i), d.gety(i), pointsize, pointsize);
+					graphicsWindow.ellipse(dataSet.get(i).x, dataSet.get(i).y, pointSize, pointSize);
 				}
 			}
 		}
@@ -135,70 +132,70 @@ public class Graph {
 	}
 
 	private void drawYAxisLabel() {
-		if ((ylabel != null) && (!ylabel.equals(""))) {
+		if ((yLabel != null) && (!yLabel.equals(""))) {
 			graphicsWindow.fill(0);
 			graphicsWindow.textSize(labelPointSize);
 			graphicsWindow.textAlign(graphicsWindow.RIGHT);
-			graphicsWindow.text(ylabel, xmin - HSPACING, (ymin + ymax) / 2);
+			graphicsWindow.text(yLabel, xmin - HSPACING, (ymin + ymax) / 2);
 		}
 	}
 
 	private void drawXAxisLabel() {
-		if ((xlabel != null) && (!xlabel.equals(""))) {
+		if ((xLabel != null) && (!xLabel.equals(""))) {
 			graphicsWindow.fill(0);
 			graphicsWindow.textSize(labelPointSize);
 			graphicsWindow.textAlign(graphicsWindow.CENTER);
-			graphicsWindow.text(xlabel, (xmin + xmax) / 2, ymax + 22);
+			graphicsWindow.text(xLabel, (xmin + xmax) / 2, ymax + 22);
 		}
 	}
 
 	private void drawXIncrements() {
-		float dxinc = (xmax - xmin) / numXIncrements;
+		float dx = (xmax - xmin) / numXIncrements;
 
-		for (float i = xmin; i < xmax; i += dxinc) {
+		for (float i = xmin; i < xmax; i += dx) {
 			graphicsWindow.stroke(100);
 			graphicsWindow.line(i, ymax, i, ymax + 4);
 		}
 	}
 
 	private void drawXIncrementLabels() {
-		float dxinc = (xmax - xmin) / numXIncrements;
-		float dataxinc = (dataxmax - dataxmin) / numXIncrements;
+		float dx = (xmax - xmin) / numXIncrements;
+		float datadx = (dataxmax - dataxmin) / numXIncrements;
 		String text;
 
 		float c = dataxmin;
-		for (float i = xmin; i < xmax; i += dxinc) {
+		for (float i = xmin; i < xmax; i += dx) {
 			graphicsWindow.fill(0);
 			graphicsWindow.textSize(10);
 			graphicsWindow.textAlign(graphicsWindow.CENTER);
 			text = Float.toString(c);
 			graphicsWindow.text(text, i, ymax + 10);
-			c += dataxinc;
+			c += datadx;
 		}
 	}
 
 	private void drawYIncrementLabels() {
-		float dyinc = (ymin - ymax) / numYIncrements;
-		float datayinc = (dataymax - dataymin) / numYIncrements;
+		float dy = (ymin - ymax) / numYIncrements;
+		float datady = (dataymax - dataymin) / numYIncrements;
 		String text;
 
 		float c = dataymax;
-		for (float i = ymax; i < ymin; i += dyinc) {
+		for (float i = ymax; i < ymin; i += dy) {
 			graphicsWindow.fill(0);
 			graphicsWindow.textSize(10);
 			graphicsWindow.textAlign(graphicsWindow.CENTER);
 			text = Float.toString(c);
 			graphicsWindow.text(text, xmin - HSPACING, i);
-			c -= datayinc;
+			c -= datady;
 		}
 	}
 
 	private void drawYIncrements() {
-		float dyinc = (ymin - ymax) / numYIncrements;
+		float dy = (ymin - ymax) / numYIncrements;
 
-		for (float i = ymax; i < ymin; i += dyinc) {
+		for (float i = ymax; i < ymin; i += dy) {
 			graphicsWindow.stroke(100);
-			graphicsWindow.line(xmin, i, xmin - HSPACING / 2, i);
+			graphicsWindow.line(xmin, i, xmin - HSPACING / 2.0f, i);
 		}
 	}
 
@@ -252,7 +249,7 @@ public class Graph {
 	// with the current scaling factors.
 	private void clearData() {
 		ScaledDataSet d;
-		Set s = dataSets.keySet();
+		Set<Object> s = dataSets.keySet();
 
 		dataSets.clear();
 
@@ -266,25 +263,26 @@ public class Graph {
 	}
 
 	private int getNextColor() {
-		int i = defaultColors[nextColor];
-		nextColor = (nextColor + 1) % defaultColors.length;
+		int i = defaultColors[nextColor++];
+		nextColor %= defaultColors.length;
 		return i;
 	}
 
-	public float xDataToXCoordinate(float xdata) {
-		return xdata * xscaleval + this.xshiftval;
+	// redundant "x" ("x data to x coord") (just say "x" once lol)
+	public float dataToCoordX(float xdata) {
+		return xdata * xscaleval + xshiftval;
 	}
 
-	public float xCoordinateToXData(float xcoord) {
-		return (xcoord - this.xshiftval) / this.xscaleval;
+	public float coordToDataX(float xcoord) {
+		return (xcoord - xshiftval) / xscaleval;
 	}
 
-	public float yDataToYCoordinate(float ydata) {
-		return ydata * yscaleval + this.yshiftval;
+	public float dataToCoordY(float ydata) {
+		return ydata * yscaleval + yshiftval;
 	}
 
-	public float yCoordinateToYData(float ycoord) {
-		return (ycoord - this.yshiftval) / this.yscaleval;
+	public float coordToDataY(float ycoord) {
+		return (ycoord - yshiftval) / yscaleval;
 	}
 
 	/**

@@ -1,4 +1,7 @@
 package Field;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 
 /**
@@ -6,27 +9,27 @@ import java.io.Serializable;
  * 
  * @author David J. Barnes and Michael Kolling.  Modified by David Dobervich 2007-2022
  */
-public class Location implements Serializable
+public class Location implements Serializable, Comparable<Location>
 {
     // Row and column positions.
-    private int row;
+    private int row; // shut up java
     private int col;
 
     /**
      * Represent a row and column.
-     * @param row The row.
-     * @param col The column.
+     * @param _row The row.
+     * @param _col The column.
      */
-    public Location(int row, int col)
+    public Location(int _row, int _col)
     {
-        this.row = row;
-        this.col = col;
+        row = _row;
+        col = _col;
     }
     
     /**
      * Implement content equality.
-     */
-    public boolean equals(Object obj)
+     */ // This function can be replaced with Comparable<Location> which automatically forces proper object comparison (no need to check object type)
+    public boolean equals(@NotNull Object obj)
     {
         if(obj instanceof Location) {
             Location other = (Location) obj;
@@ -34,6 +37,14 @@ public class Location implements Serializable
         }
         else {
             return false;
+        }
+    }
+
+    public int compareTo(@NotNull Location o) {
+        if (row == o.row && col == o.col) {
+            return 0;
+        } else {
+            return -1;
         }
     }
     
@@ -45,7 +56,9 @@ public class Location implements Serializable
     {
         return col + "," + row;
     }
-    
+
+
+
     /**
      * Use the top 16 bits for the row value and the bottom for
      * the column. Except for very big grids, this should give a
@@ -73,19 +86,22 @@ public class Location implements Serializable
         return col;
     }
 
-    /**
+
+    // these functions are literally useless????
+    /*
      * @return The row.
-     */
+     *
     public int gety()
     {
         return row;
     }
     
-    /**
+
      * @return The column.
-     */
+     *
     public int getx()
     {
         return col;
     }
+     */
 }
